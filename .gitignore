@@ -44,4 +44,5 @@ credentials/*
 
 images/
 predictions.png
+.DS_Store
 
