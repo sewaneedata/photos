@@ -41,3 +41,5 @@ vignettes/*.pdf
 credentials/*
 
 *.jpg
+
+.DS_Store
