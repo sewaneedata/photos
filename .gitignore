@@ -40,7 +40,6 @@ vignettes/*.pdf
 
 credentials/*
 
-*.jpg
 
 images/
 predictions.png
