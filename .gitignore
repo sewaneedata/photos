@@ -45,4 +45,6 @@ images/
 predictions.png
 .DS_Store
 
+CON
 example_images_labelled/
+example_images_rock_labelled/

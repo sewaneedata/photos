@@ -36,13 +36,14 @@ rasterImage(predictions,  1, 1, 2, 2)
 cppFunction('void redir(){FILE* F=freopen("capture.txt","w+",stdout);}')
 cppFunction('void resetredir(){FILE* F=freopen("CON","w+",stdout);}')
 
-path <- image_dir <- 'example_images/'
+path <- image_dir <- 'example_images_rock' # alternatively  #example_images
 
 images <- dir(image_dir)
 
 # Save a place to stick labelled images
-if(!dir.exists('example_images_labelled')){
-  dir.create('example_images_labelled')
+label_path <- paste0(path, '_labelled')
+if(!dir.exists(label_path)){
+  dir.create(label_path)
 }
 
 results_list <- list() # empty list
@@ -51,14 +52,14 @@ for(i in 1:length(images)){
   redir(); 
   x <- image_darknet_detect(file = this_image, 
                             object = yolo_tiny_voc,
-                            threshold = 0.19)
+                            threshold = 0.1)
   resetredir();
   # Save the image
   new_image_path <- strsplit(images[i], split = '.', fixed = TRUE)
-  new_image_path <- unlist(new_image_path[1])
+  new_image_path <- unlist(new_image_path)[1]
   new_image_path <- paste0(new_image_path, '.png')
   file.copy('predictions.png',
-            file.path('example_images_labelled',
+            file.path(label_path,
                       new_image_path))
   file.remove('predictions.png')
   # writeLines(readLines('capture.txt'))
