@@ -49,10 +49,10 @@ test_boxes <- get_boxes(
 # Take a look at the bounding boxes
 test_boxes
 
-
+i = 1
 plot_boxes(
-  images_paths = test_img_paths, # Images paths
-  boxes = test_boxes, # Bounding boxes
+  images_paths = test_img_paths[i], # Images paths
+  boxes = list(test_boxes[[i]]), # Bounding boxes
   correct_hw = TRUE, # Should height and width of bounding boxes be corrected to image height and width
   labels = coco_labels # Class labels
 )
