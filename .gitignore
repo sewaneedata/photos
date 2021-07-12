@@ -48,3 +48,4 @@ predictions.png
 CON
 example_images_labelled/
 example_images_rock_labelled/
+yolov3.weights
