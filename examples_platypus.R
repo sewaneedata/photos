@@ -15,14 +15,19 @@ test_yolo <- yolo3(
 # into your photos repo: https://pjreddie.com/media/files/yolov3.weights
 test_yolo %>% load_darknet_weights("yolov3.weights")
 
-test_img_paths <- list.files(system.file("extdata", "images", package = "platypus"), full.names = TRUE, pattern = "coco")
-test_img_paths <- list.files('images/Malde_Images',
-                             all.files = TRUE,
-                             full.names = TRUE,
-                             recursive = TRUE,
-                             pattern = 'jpg')
+# test_img_paths <- list.files(system.file("extdata", "images", package = "platypus"), full.names = TRUE, pattern = "coco")
+# test_img_paths <- list.files('images/Malde_Images',
+#                              all.files = TRUE,
+#                              full.names = TRUE,
+#                              recursive = TRUE,
+                             # pattern = 'jpg')
 
-test_img_paths <- test_img_paths[1:3]
+test_img_paths <- c(
+  "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080496.jpg",  
+  "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080497.jpg", 
+  "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080498-2.jpg"
+)
+
 # install_tensorflow() 
 # reticulate::py_config()
 # reticulate::py_install("pillow")
@@ -43,7 +48,7 @@ test_boxes <- get_boxes(
   preds = test_preds, # Raw predictions form YOLOv3 model
   anchors = coco_anchors, # Anchor boxes
   labels = coco_labels, # Class labels
-  obj_threshold = 0.6, # Object threshold
+  obj_threshold = 0.5, # Object threshold
   nms = TRUE, # Should non-max suppression be applied
   nms_threshold = 0.6, # Non-max suppression threshold
   correct_hw = FALSE # Should height and width of bounding boxes be corrected to image height and width
@@ -53,14 +58,21 @@ test_boxes <- get_boxes(
 test_boxes
 
 # Loop through each photo and save the labelled plot
+label_dir <- 'images_labelled'
+if(!dir.exists(label_dir)){
+  dir.create(label_dir)
+}
 for(i in 1:length(test_boxes)){
   message('Plotting ', i, ' of ', length(test_boxes))
   plot_boxes(
     images_paths = test_img_paths[i], # Images paths
     boxes = list(test_boxes[[i]]), # Bounding boxes
     correct_hw = TRUE, # Should height and width of bounding boxes be corrected to image height and width
-    labels = coco_labels # Class labels
+    labels = coco_labels, # Class labels
+    save_dir = label_dir,
+    plot_images = TRUE
   )
+  
 }
 
 
