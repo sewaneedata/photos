@@ -16,10 +16,13 @@ test_yolo <- yolo3(
 test_yolo %>% load_darknet_weights("yolov3.weights")
 
 test_img_paths <- list.files(system.file("extdata", "images", package = "platypus"), full.names = TRUE, pattern = "coco")
-test_img_paths <- list.files('example_images',
+test_img_paths <- list.files('images/Malde_Images',
+                             all.files = TRUE,
                              full.names = TRUE,
+                             recursive = TRUE,
                              pattern = 'jpg')
 
+test_img_paths <- test_img_paths[1:3]
 # install_tensorflow() 
 # reticulate::py_config()
 # reticulate::py_install("pillow")
@@ -49,13 +52,18 @@ test_boxes <- get_boxes(
 # Take a look at the bounding boxes
 test_boxes
 
-i = 1
-plot_boxes(
-  images_paths = test_img_paths[i], # Images paths
-  boxes = list(test_boxes[[i]]), # Bounding boxes
-  correct_hw = TRUE, # Should height and width of bounding boxes be corrected to image height and width
-  labels = coco_labels # Class labels
-)
+# Loop through each photo and save the labelled plot
+for(i in 1:length(test_boxes)){
+  message('Plotting ', i, ' of ', length(test_boxes))
+  plot_boxes(
+    images_paths = test_img_paths[i], # Images paths
+    boxes = list(test_boxes[[i]]), # Bounding boxes
+    correct_hw = TRUE, # Should height and width of bounding boxes be corrected to image height and width
+    labels = coco_labels # Class labels
+  )
+}
+
+
 
 # Got here? Great. Look here for how to do this on your own custom data:
 # https://github.com/maju116/platypus#yolov3-object-detection-with-custom-dataset
