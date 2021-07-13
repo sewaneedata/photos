@@ -1,4 +1,9 @@
 # remotes::install_github("maju116/platypus")
+library(reticulate)
+if (Sys.info()["user"]=="hieungannguyen"){
+  use_python("~/miniforge3/bin/python")
+  use_condaenv("tf_env")
+}
 library(tidyverse)
 library(platypus)
 library(abind)
@@ -24,8 +29,7 @@ test_yolo %>% load_darknet_weights("yolov3.weights")
 
 test_img_paths <- c(
   "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080496.jpg",  
-  "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080497.jpg", 
-  "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080498-2.jpg"
+  "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080497.jpg"
 )
 
 # install_tensorflow() 
