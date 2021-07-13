@@ -1,5 +1,7 @@
 # remotes::install_github("maju116/platypus")
-library(reticulate)
+library(tensorflow)
+library(keras)
+# library(reticulate)
 if (Sys.info()["user"]=="hieungannguyen"){
   use_python("~/miniforge3/bin/python")
   use_condaenv("tf_env")
