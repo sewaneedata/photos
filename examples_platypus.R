@@ -22,64 +22,86 @@ test_yolo <- yolo3(
 # into your photos repo: https://pjreddie.com/media/files/yolov3.weights
 test_yolo %>% load_darknet_weights("yolov3.weights")
 
-# test_img_paths <- list.files(system.file("extdata", "images", package = "platypus"), full.names = TRUE, pattern = "coco")
+# Uncomment the below
 # test_img_paths <- list.files('images/Malde_Images',
 #                              all.files = TRUE,
 #                              full.names = TRUE,
 #                              recursive = TRUE,
                              # pattern = 'jpg')
 
-test_img_paths <- c(
+# Comment out the below (once you have confirmed it works)
+relative_paths <- c(
   "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080496.jpg",  
   "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080497.jpg"
 )
 
+test_img_paths <- file.path(getwd(), releative_paths)
 # install_tensorflow() 
 # reticulate::py_config()
 # reticulate::py_install("pillow")
-test_imgs <- test_img_paths %>%
-  map(~ {
-    image_load(., target_size = c(416, 416), grayscale = FALSE) %>%
-      image_to_array() %>%
-      `/`(255)
-  }) %>%
-  abind(along = 4) %>%
-  aperm(c(4, 1:3))
-test_preds <- test_yolo %>% predict(test_imgs)
 
-# Take a peak at the predictions
-str(test_preds)
-
-test_boxes <- get_boxes(
-  preds = test_preds, # Raw predictions form YOLOv3 model
-  anchors = coco_anchors, # Anchor boxes
-  labels = coco_labels, # Class labels
-  obj_threshold = 0.5, # Object threshold
-  nms = TRUE, # Should non-max suppression be applied
-  nms_threshold = 0.6, # Non-max suppression threshold
-  correct_hw = FALSE # Should height and width of bounding boxes be corrected to image height and width
-)
-
-# Take a look at the bounding boxes
-test_boxes
 
 # Loop through each photo and save the labelled plot
 label_dir <- 'images_labelled'
 if(!dir.exists(label_dir)){
   dir.create(label_dir)
 }
-for(i in 1:length(test_boxes)){
-  message('Plotting ', i, ' of ', length(test_boxes))
+
+# Create a list for saving results
+results_list <- list()
+
+# loop through each photo and get prediction
+for(i in 1:length(test_img_paths)){
+  message('Plotting ', i, ' of ', length(test_img_paths))
+  
+  # Get the specific path
+  test_img_path <- test_img_paths[i]
+  test_img <- test_img_path %>%
+    map(~ {
+      image_load(., target_size = c(416, 416), grayscale = FALSE) %>%
+        image_to_array() %>%
+        `/`(255)
+    }) %>%
+    abind(along = 4) %>%
+    aperm(c(4, 1:3))
+  test_preds <- test_yolo %>% predict(test_img)
+  
+  # # Take a peak at the predictions
+  # str(test_preds)
+  
+  test_boxes <- get_boxes(
+    preds = test_preds, # Raw predictions form YOLOv3 model
+    anchors = coco_anchors, # Anchor boxes
+    labels = coco_labels, # Class labels
+    obj_threshold = 0.5, # Object threshold
+    nms = TRUE, # Should non-max suppression be applied
+    nms_threshold = 0.6, # Non-max suppression threshold
+    correct_hw = FALSE # Should height and width of bounding boxes be corrected to image height and width
+  )
+  
+  # # Take a look at the bounding boxes
+  # test_boxes
+  
+  # Save the results in the results list
+  these_results <- test_boxes[[1]]
+  out <- bind_cols(
+    these_results,
+    tibble(path = relative_paths[i])
+  )
+  # 
+  
   plot_boxes(
-    images_paths = test_img_paths[i], # Images paths
-    boxes = list(test_boxes[[i]]), # Bounding boxes
+    images_paths = test_img_path, # Images paths
+    boxes = test_boxes,#list(test_boxes), # Bounding boxes
     correct_hw = TRUE, # Should height and width of bounding boxes be corrected to image height and width
     labels = coco_labels, # Class labels
     save_dir = label_dir,
     plot_images = TRUE
   )
-  
 }
+results <- bind_rows(results_list)
+
+
 
 
 
