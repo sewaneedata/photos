@@ -1,3 +1,6 @@
+################################################################################
+# Setup system
+
 # remotes::install_github("maju116/platypus")
 library(tensorflow)
 library(keras)
@@ -9,6 +12,7 @@ if (Sys.info()["user"]=="hieungannguyen"){
 library(tidyverse)
 library(platypus)
 library(abind)
+
 test_yolo <- yolo3(
   net_h = 416, # Input image height. Must be divisible by 32
   net_w = 416, # Input image width. Must be divisible by 32
@@ -17,6 +21,7 @@ test_yolo <- yolo3(
   anchors = coco_anchors # Anchor boxes
 )
 
+################################################################################
 
 # Before running the below, download this file
 # into your photos repo: https://pjreddie.com/media/files/yolov3.weights
@@ -31,15 +36,16 @@ relative_paths <- list.files('images',
 
 # # Comment out the below (once you have confirmed it works)
 # relative_paths <- c(
-#   "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080496.jpg",  
+#   "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080496.jpg",
 #   "images/Malde_Images/SDI_Haiti_Trial-2/20160813-P1080497.jpg"
 # )
 
 test_img_paths <- file.path(getwd(), relative_paths)
-# install_tensorflow() 
+# install_tensorflow()
 # reticulate::py_config()
 # reticulate::py_install("pillow")
 
+################################################################################
 
 # Loop through each photo and save the labelled plot
 label_dir <- 'images_labelled'
@@ -51,7 +57,6 @@ if(!dir.exists(predictions_dir)){
   dir.create(predictions_dir)
 }
 
-
 # Create a list for saving results
 results_list <- list()
 
@@ -59,26 +64,26 @@ results_list <- list()
 counter <- 0
 for(i in 1:length(test_img_paths)){
   message('Plotting ', i, ' of ', length(test_img_paths))
-  
-  
+
+
   # Get the specific path
   test_img_path <- test_img_paths[i]
-  
+
   # Get the relative path
   relative_path <- relative_paths[i]
-  
+
   # Transform the relative path into a file name which is compatible
   # with data (instead of photo)
   relative_data_path <- file.path(predictions_dir, paste0(unlist(lapply(strsplit(relative_path, split = '.', fixed = TRUE), function(x){x[1]})), '.RData'))
   relative_data_path <- gsub('/', '&&&', relative_data_path)
   relative_data_path <- gsub('predictions&&&', 'predictions/', relative_data_path)
   already_exists <- file.exists(relative_data_path)
-  
+
   if(already_exists){
     load(relative_data_path)
   } else {
     # predictions do not exist for this file, we need to run from scratch
-    
+
     test_img <- test_img_path %>%
       map(~ {
         image_load(., target_size = c(416, 416), grayscale = FALSE) %>%
@@ -88,10 +93,10 @@ for(i in 1:length(test_img_paths)){
       abind(along = 4) %>%
       aperm(c(4, 1:3))
     test_preds <- test_yolo %>% predict(test_img)
-    
+
     # # Take a peak at the predictions
     # str(test_preds)
-    
+
     try({
       test_boxes <- get_boxes(
         preds = test_preds, # Raw predictions form YOLOv3 model
@@ -110,7 +115,7 @@ for(i in 1:length(test_img_paths)){
       )
       # save the prediction
       save(out, file = relative_data_path)
-      
+
       plot_boxes(
         images_paths = test_img_path, # Images paths
         boxes = test_boxes,#list(test_boxes), # Bounding boxes
@@ -118,16 +123,16 @@ for(i in 1:length(test_img_paths)){
         labels = coco_labels, # Class labels
         save_dir = label_dir,
         plot_images = TRUE
-      )  
+      )
     })
-    
+
     counter <- counter + 1
     results_list[[counter]] <- out
-    
+
   }
 }
   results <- bind_rows(results_list)
-  
-  
+
+
   # Got here? Great. Look here for how to do this on your own custom data:
   # https://github.com/maju116/platypus#yolov3-object-detection-with-custom-dataset
