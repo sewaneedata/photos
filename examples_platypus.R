@@ -133,6 +133,27 @@ for(i in 1:length(test_img_paths)){
 }
   results <- bind_rows(results_list)
 
+  image_files <- list.files ("images", full.names = TRUE, recursive = TRUE, all.files = TRUE)
+list <- read_exif(image_files, tags = c("filename", "imagesize", "DateTimeOriginal", "ImageSize", "ImageWidth", "ImageHeight"), quiet = FALSE)
+  merged_meta <- merge(results, list, by.x = 'path', by.y = 'SourceFile')
+
+  merged_meta <- merged_meta %>% mutate (year = substr(DateTimeOriginal, 1, 4),
+                                       month = substr(DateTimeOriginal, 6, 7),
+                                       day = substr(DateTimeOriginal, 9, 10), 
+                                       time = substr(DateTimeOriginal, 12, 16))
+
+  # There was some kind of error in the images meta that listed 2015 files as 2051, this should correct it
+  merged_meta$year[merged_meta$year == 2051] <- 2015
+  
+  data <- merged_meta %>%
+          group_by(year, label) %>%
+          tally
+  # Isolating Haiti files from the mix of Haiti and Rock Art files produced 
+  merged_meta_haiti_only <- merged_meta %>% 
+                            filter(!grepl('ALV', FileName))
+  
+  write_csv(overview, '~/Documents/tutorial/data.csv')
+
 
   # Got here? Great. Look here for how to do this on your own custom data:
   # https://github.com/maju116/platypus#yolov3-object-detection-with-custom-dataset
