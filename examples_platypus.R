@@ -152,6 +152,7 @@ list <- read_exif(image_files, tags = c("filename", "imagesize", "DateTimeOrigin
   merged_meta_haiti_only <- merged_meta %>% 
                             filter(!grepl('ALV', FileName))
   
+  # Careful with the path below, make sure you change it as necessary to your working directory
   write_csv(overview, '~/Documents/tutorial/data.csv')
 
 
