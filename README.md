@@ -4,7 +4,7 @@
 
 - You need `admin` credentials from Sewanee DataLab's AWS account in order to work on this rep. Save the `.csv` files provided to you as `credentials/aws_datalab_admin.csv`.  If you don't have credentials, email `datalab@sewanee.edu`. 
 
-- Load the object detection algorithms in the file `yolo3.weights` from [this website.](https://pjreddie.com/media/files/yolov3.weights). Put that file in this repo (it is large: 248 MB). 
+- Load the object detection algorithms in the file `yolo3.weights` from [this website.](https://pjreddie.com/media/files/yolov3.weights) Put that file in this repo (it is large: 248 MB). 
 
 - The first time you load packages may be clunky, primarily due to the installation of `tensorflow` and `keras`, the machine-learning packages that power the `platypus` package used in this project.  If you run into issues, open up the file `function-analyze-photo.R` and walk through the code for the `setup_system()` function one row at a time. 
 
@@ -23,7 +23,7 @@ This code contains core functions for analyzing a photo.
 
 This file contains all the code for interacting with S3 bucket.  
 
-- The functions **`load_aws_credentials()** and **`inventory_bucket()`** access and inventory the files stored in the 'photos' bucket in Sewanee DataLab's AWS S3 account.  
+- The functions **`load_aws_credentials()`** and **`inventory_bucket()`** access and inventory the files stored in the 'photos' bucket in Sewanee DataLab's AWS S3 account.  
 
 - The function **`prep_destinations()`** prepares all the filepath versions needed to pass photos and results back and forth between the local shiny directory and the S3 bucket. 
 
