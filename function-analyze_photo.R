@@ -33,13 +33,16 @@ setup_system <- function(){
   # Load weights
   # Before running the below, download this file
   # into your photos repo: https://pjreddie.com/media/files/yolov3.weights
-  test_yolo %>% load_darknet_weights("yolov3.weights")
+  suppressMessages({
+    test_yolo %>% load_darknet_weights("yolov3.weights")
+  })
 
   return(test_yolo)
 }
 
 ################################################################################
 
+#test_img_path <- 'example_images/haiti7.jpeg'
 #img_path <- test_img_path
 #to_plot=TRUE
 #debug=TRUE
@@ -54,7 +57,7 @@ analyze_photo <- function(img_path,
 
   if(debug){message('Making predictions ...')}
   test_img <- img_path %>%
-    map(~ {
+    purrr::map(~ {
       image_load(., target_size = c(416, 416), grayscale = FALSE) %>%
         image_to_array() %>%
         `/`(255)

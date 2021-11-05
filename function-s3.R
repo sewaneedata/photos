@@ -377,6 +377,7 @@ gather_predictions <- function(local_only=FALSE){
 
       # Add these new predictions to the existing list
       new_predictions <- bind_rows(results_list)
+      if(! 'label_img' %in% names(predictions)){predictions$label_img <- NA}
       tot_predictions <- rbind(predictions, new_predictions)
 
       # Update the list on file
