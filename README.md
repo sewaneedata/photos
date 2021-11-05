@@ -49,3 +49,9 @@ This is the Shiny app.  The app can work without S3 credentials as long as the `
 Contains original code from DataLab summer 2021 to ensure that nothing was lost in the major overhaul needed to integrate this project with S3 compatibility. 
 
 
+##### Next steps
+
+- Polish shiny app aesthetics (plot formatting, about page) in local-only mode.  
+- Ensure photo processing through the shiny app works on other machines.  
+- Troubleshoot Image display in shiny app (it is supposed to display the classification results after a photo is processed; otherwise it is supposed to remain blank). Consider expanding into a photo explorer for all processed photos. A kind of gallery.  
+- Try putting on the sewanee.io ubuntu server and see if the processing code still works. Attempt to publish live.  
