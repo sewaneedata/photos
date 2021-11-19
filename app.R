@@ -13,6 +13,8 @@ library(ggthemes)
 library(ggplot2)
 library (leaflet)
 library(slickR)
+library(exifr)
+library(exiftoolr)
 
 # Bring in functions for analyzing photos and interacting with AWS S3 bucket
 source('function-s3.R')
