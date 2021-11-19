@@ -87,6 +87,74 @@ prep_destinations <- function(bucket){
 ################################################################################
 ################################################################################
 ################################################################################
+# Download 10 images
+
+download_image_batch <- function(n_images=10,
+         page_i = 1,
+         verbose=TRUE){
+
+  #n_images=10
+  #page_i=1
+  #verbose=TRUE
+  #download_image_batch(n_images, page_i)
+
+  # Stage tmp directory
+  tmp_dir <- tempdir()
+  img_dir <- paste0(tmp_dir,'/img_gallery/')
+  if(dir.exists(img_dir)){unlink(img_dir,recursive=TRUE)}
+  dir.create(img_dir)
+
+  # Inventorying files
+  if(verbose){message('Inventorying processed photographs on AWS S3 ...')}
+  s3files <- inventory_bucket()
+  procfiles <- s3files[grep('processed/images',s3files$file),]
+  procfiles <- procfiles[grep('malde',tolower(procfiles$file)),]
+  procfiles <- procfiles[-grep('-2.jpg',tolower(procfiles$file)),]
+  #procfiles <- procfiles[-grep('RData',procfiles$file),]
+  procfiles <- procfiles[rev(order(procfiles$uploaded)),]
+  procfiles %>% head(20)
+
+  starti <- (page_i - 1)*n_images + 1
+  endi <- (page_i - 1)*n_images + n_images
+
+  # make sure starti and endi are not longer than number of files
+  if(starti > nrow(procfiles)){
+    starti <- 1
+    endi <- n_images
+  }else{
+    if(endi > nrow(procfiles)){
+      endi <- nrow(procfiles)
+    }
+  }
+
+  starti
+  endi
+  if(verbose){message('Downloading images for viewing ...')}
+  i=10
+  imgfiles <- c()
+  for(i in starti:endi){
+    if(verbose){message('--- image ',i,' ...')}
+    fili <- procfiles$file[i] ; fili
+    filecore <- gsub('photos/processed/images/','',fili)
+    filecore <- gsub('/','&&&',filecore)
+    imgfiles <- c(imgfiles, filecore)
+    local_path <- paste0(img_dir,'/',filecore)
+    local_path
+    save_object(object = fili,
+                bucket = 'sewaneedatalab',
+                file = local_path)
+  }
+
+  dir(img_dir)
+  imgfiles
+
+  return(list(tmp = img_dir,
+              img = imgfiles))
+}
+
+################################################################################
+################################################################################
+################################################################################
 # Process a photo from s3
 
 analyze_photo_s3 <- function(bucket_file,

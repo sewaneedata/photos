@@ -12,6 +12,7 @@ library(readr)
 library(ggthemes)
 library(ggplot2)
 library (leaflet)
+library(slickR)
 
 # Bring in functions for analyzing photos and interacting with AWS S3 bucket
 source('function-s3.R')
@@ -59,7 +60,8 @@ load_photo_data <- function(local_only=FALSE){
 ui <- fluidPage(
     shinyjs::useShinyjs(),
     # Application title
-    titlePanel("Objects in Photos"),
+    titlePanel("Haiti Institute in Sewanee: Photograph analysis"),
+    br(),
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
@@ -92,12 +94,19 @@ ui <- fluidPage(
                 ),
                 tabPanel(h4('Images'),
                          #fluidRow(column(12,uiOutput('show_image')))
-                         fluidRow(column(6,imageOutput('show_image')),
-                                  column(6))
+                         br(),
+                         fluidRow(column(6,h3('Examples of photographic analysis:')),
+                                  column(6,br(),actionButton('img_page_next','Download next batch of examples',width='95%'))),
+                         fluidRow(column(1),
+                                  column(10,slickROutput('show_image')),
+                                  column(1))
                 ),
                 tabPanel(h4('About'),
                          br(),
-                         fluidRow(column(12,'Background details go here'))
+                         fluidRow(column(12,HTML("<b>The Haiti Institute In Sewanee Program </b>is a center for collaborative educational partnerships between Haiti and Sewanee. </br></br>Through a wide collection of projects, the Haiti Institute in Sewanee Program aims to promote scholarship research across a wide range of disciplines both in Sewanee and in Haiti.
+One of the projects of the Institute is to promote economic development in a community of farmers through a variety of avenues. One of the strategies to track this economic development involved giving 10 cameras to 10 farmer families. </br></br>The instructions given to them were strategically photographic and intentionally less about the content of the photographs.
+</br></br>The idea was to document as much as possible about their daily lives. This project started in 2009 and has collected more than 2400 photographs and is still ongoing.
+	In the summer of 2021, the Sewanee Datalab used convolutional neural networks for object detection in the photographs' contents. Once predictions were made, they were used to create this dashboard that quantifies the contents of the photos and shows the frequency of objects over a certain period of time.")))
                          )
             )
         )
@@ -110,12 +119,14 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-
     # Stage reactive values
     rv <- reactiveValues()
     rv$refresh_ticker <- 0
     rv$df <- data.frame()
     rv$most_recent_image <- NULL
+    rv$img_page <- 0
+    rv$tmp <- NULL
+    rv$update_gallery <- 0
 
     #observe({
     #    rv$refresh_ticker <- rv$refresh_ticker + 1
@@ -196,21 +207,43 @@ server <- function(input, output) {
             geom_bar(stat='identity', position = position_dodge(width = 0.9)) +
             geom_text(aes(label = frequency), vjust = -0.5,
                       position = position_dodge(width = 0.9))
+
         }
         }
     })
 
     output$predictions <- DT::renderDataTable({rv$df})
 
-    #output$show_image <- renderUI({
-    output$show_image <- renderImage({
-        if(!is.null(rv$most_recent_image)){
-            list(src=rv$most_recent_image)
-            #img(src=rv$most_recent_image,
-            #    style="width=300px")
+    # Step forward to next page of images
+    observeEvent(input$img_page_next,{
+        rv$img_page <- rv$img_page + 1
+        withCallingHandlers({
+            shinyjs::html("text","")
+            dimg <- download_image_batch(n_images = 10,
+                                         page_i = rv$img_page)
+        },
+        message=function(m){shinyjs::html(id="text",html=m$message,add=FALSE)}
+        )
+        message('Standing by')
+        print(dimg$img)
+
+        rv$tmp <- dimg$tmp
+        rv$update_gallery <- rv$update_gallery + 1
+    })
+
+    output$show_image <- renderSlickR({
+        rv$update_gallery
+
+        photodir <- 'images_labelled/'
+        if(!is.null(rv$tmp)){
+            photodir <- paste0(rv$tmp,'/')
+            print(photodir)
         }
-    #})
-    },outputArgs=list(width='50%'))
+        photos <- dir(photodir)
+        imgs <- paste0(photodir,photos)
+        slickR(imgs, height=600)
+    })
+
 }
 
 ################################################################################
