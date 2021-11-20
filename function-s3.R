@@ -491,7 +491,7 @@ gather_image_metadata <- function(local_only=FALSE){
   # Get current table of image metadata
   if(file.exists('image_metadata.csv')){
     message('image_metadata.csv already exists. Starting with existing file ...')
-    meta <- read.csv('image_metadata.csv')
+    meta <- read.csv('image_metadata.csv', stringsAsFactors=FALSE)
   }else{
     message('image_metadata.csv not found in working directory. Creating new file ...')
     meta <- data.frame()
