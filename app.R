@@ -252,7 +252,7 @@ server <- function(input, output) {
         rv$update_gallery
 
         photodir <- 'images_labelled/'
-        if(!is.null(rv$tmp)){
+        if(all(!is.null(rv$tmp), !input$local_only)){
             photodir <- paste0(rv$tmp,'/')
             print(photodir)
         }
