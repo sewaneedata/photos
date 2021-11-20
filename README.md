@@ -1,5 +1,12 @@
 # ML inventory of objects in photographs
 
+This repo and app operate on two different levels:  
+
+- On the simplest level, this is a Shiny app that displays trends in image detections and demos a few images that have been labeled by the AI algorithm. This is what is shown online at [sewanee.io/haiti](https://www.sewanee.io/haiti).  You don't need AWS credentials to run or work on the app at this level. As long as "`Use local data only`" remains checked in the app, everything should work.  
+
+- On the more complex level, the app can be run locally on your machine in a way that allows you to analyze new photos.  The rest of these instructions pertain mainly to this second level.  
+
+
 ## Setup 
 
 - You need `admin` credentials from Sewanee DataLab's AWS account in order to work on this rep. Save the `.csv` files provided to you as `credentials/aws_datalab_admin.csv`.  If you don't have credentials, email `datalab@sewanee.edu`. 
@@ -26,6 +33,8 @@ This file contains all the code for interacting with S3 bucket.
 - The functions **`load_aws_credentials()`** and **`inventory_bucket()`** access and inventory the files stored in the 'photos' bucket in Sewanee DataLab's AWS S3 account.  
 
 - The function **`prep_destinations()`** prepares all the filepath versions needed to pass photos and results back and forth between the local shiny directory and the S3 bucket. 
+
+- The function **`download_image_batch()`** is used in the `Shiny` app to download images from AWS S3 for display in the Images tab.  
 
 - The function **`analyze_photo_s3()`** is a wrapper for `analyze_photo()`. It downloads an image from S3, analyzes it, and uploads the results back to S3.  
 
