@@ -39,7 +39,9 @@ load_photo_data <- function(local_only=TRUE){
     #head(df)
     file_core <- gsub('&&&','/',df$file)
     file_core <- gsub('processed/results/','',file_core)
-    file_core <- sapply(strsplit(file_core,'.',fixed=TRUE),'[[',1)
+    if(all(length(file_core) > 0, all(is.character(file_core)))){
+        file_core <- sapply(strsplit(file_core,'.',fixed=TRUE),'[[',1)
+    }
     df$file_core <- file_core
     head(df$file_core)
 
@@ -48,7 +50,10 @@ load_photo_data <- function(local_only=TRUE){
 
     #head(meta)
     meta$SourceFile <- NULL
-    file_core <- sapply(base::strsplit(meta$FileName,'.',fixed=TRUE),'[[',1)
+    filecore <- c()
+    if(all(nrow(meta) > 0, all(is.character(meta$FileName)))){
+      file_core <- sapply(base::strsplit(meta$FileName,'.',fixed=TRUE),'[[',1)
+    }
     meta$file_core <- file_core
     head(meta$file_core)
 
@@ -102,7 +107,7 @@ ui <- fluidPage(
                          #fluidRow(column(12,uiOutput('show_image')))
                          br(),
                          fluidRow(column(6,h3('Examples of photographic analysis:')),
-                                  column(6,br(),actionButton('img_page_next','Download next batch of examples',width='95%'))),
+                                  column(6,br(),uiOutput('img_page_next'))),
                          fluidRow(column(1),
                                   column(10,slickROutput('show_image')),
                                   column(1))
@@ -219,6 +224,12 @@ server <- function(input, output) {
     })
 
     output$predictions <- DT::renderDataTable({rv$df})
+
+    output$img_page_next <- renderUI({
+        if(!input$local_only){
+            actionButton('img_page_next','Download next batch of examples',width='95%')
+        }
+    })
 
     # Step forward to next page of images
     observeEvent(input$img_page_next,{
