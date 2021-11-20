@@ -42,9 +42,12 @@ load_photo_data <- function(local_only=FALSE){
     df$file_core <- file_core
     head(df$file_core)
 
+    print(head(df))
+    print(head(meta))
+
     #head(meta)
     meta$SourceFile <- NULL
-    file_core <- sapply(strsplit(meta$FileName,'.',fixed=TRUE),'[[',1)
+    file_core <- sapply(base::strsplit(meta$FileName,'.',fixed=TRUE),'[[',1)
     meta$file_core <- file_core
     head(meta$file_core)
 
@@ -138,7 +141,7 @@ server <- function(input, output) {
         rv$refreshticker
         withCallingHandlers({
             shinyjs::html("text","")
-            isolate({df_reloaded <- load_photo_data(local_only=input$local_only)})
+            shiny::isolate({df_reloaded <- load_photo_data(local_only=input$local_only)})
             message('Standing by')
             rv$df <- df_reloaded
         },
