@@ -26,9 +26,10 @@ options(shiny.maxRequestSize = 30*1024^2)
 ################################################################################
 # Function to load in data (and re-load from within the app)
 
-load_photo_data <- function(local_only=FALSE){
+load_photo_data <- function(local_only=TRUE){
 
     # local_only = Running locally, or can you connect to the s3 bucket?
+    if(is.null(local_only)){local_only = TRUE}
 
     # Gather predictions and image metadata
     df <- gather_predictions(local_only)
